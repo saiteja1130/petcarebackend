@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",        // Important for Node + Express
+    "rootDir": "src",
+    "outDir": "dist",
+    "esModuleInterop": false,     // Fixes default import of CommonJS
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
