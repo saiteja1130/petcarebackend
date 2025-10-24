@@ -3,6 +3,9 @@ import User from "../Models/UserModel.js";
 import { generateToken } from "../Helpers/generateToken.ts";
 import ServiceArea from "../Models/ServiceAreaModel.js";
 import Pet from "../Models/PetModel.js";
+import PetType from "../Models/PetTypeModel.js";
+import PetBreed from "../Models/PetBreedModel.js";
+import ServicePackage from "../Models/ServicePackageModel.js";
 
 export const login = async (req: any, res: any) => {
   const { email, password } = req.body;
@@ -356,5 +359,78 @@ export const updateProfile = async (req: any, res: any) => {
   } catch (error: any) {
     console.error("ERROR DURING PROFILE UPDATE", error);
     res.status(500).send({ message: error.message, success: false });
+  }
+};
+
+export const getPetTypes = async (req: any, res: any) => {
+  try {
+    const petTypes = await PetType.find().sort({ createdAt: -1 });
+
+    const petData = petTypes.map((pet) => ({
+      petType: pet.name,
+      petTypeId: pet._id,
+    }));
+    res.send({
+      status: true,
+      petTypes: petData,
+      message: "Pet Types",
+    });
+  } catch (error: any) {
+    console.log("GET PET TYPES ERROR", error);
+    res.send({ message: error.message, status: false });
+  }
+};
+
+export const getBreedsByType = async (req: any, res: any) => {
+  const { petTypeId } = req.params;
+  try {
+    const breeds = await PetBreed.find({ petTypeId })
+      .select("-_id -createdAt -updatedAt -__v -petTypeId")
+      .lean();
+    const petBreeds = breeds.map((pet) => pet.name);
+    res.status(200).json({ success: true, breeds: petBreeds });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getServicePackages = async (req: any, res: any) => {
+  try {
+    const { typeId } = req.params;
+    const serviceMap: Record<string, string> = {
+      "1": "Walking",
+      "2": "Grooming",
+    };
+    const serviceName = serviceMap[typeId];
+
+    const filter = serviceName ? { serviceType: serviceName } : {};
+
+    const packages = await ServicePackage.find(filter)
+      .select("-__v")
+      .lean()
+      .sort({ createdAt: -1 });
+
+    const structuredPackages = packages.map((pack) => {
+      const { _id, addons = [], trimming = [], ...rest } = pack;
+
+      const cleanedAddons = addons.map(({ _id, ...addonRest }) => ({
+        ...addonRest,
+      }));
+
+      const cleanedTrimming = trimming.map(({ _id, ...trimRest }) => ({
+        ...trimRest,
+      }));
+
+      return {
+        ...rest,
+        packageId: _id,
+        addons: cleanedAddons,
+        trimming: cleanedTrimming,
+      };
+    });
+
+    res.status(200).json({ success: true, packages: structuredPackages });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };

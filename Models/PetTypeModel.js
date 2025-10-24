@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const PetTypeSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true }, // e.g., "Dog", "Cat"
+    name: { type: String, required: true, unique: true }, 
   },
   { timestamps: true }
 );

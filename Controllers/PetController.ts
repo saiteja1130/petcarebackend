@@ -133,7 +133,6 @@ export const updatePet = async (req: any, res: any) => {
   }
 };
 
-
 export const deletePet = async (req: any, res: any) => {
   const userId = req.userId; 
   const { petId } = req.body; 
