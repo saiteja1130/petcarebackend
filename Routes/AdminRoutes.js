@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAdminAuth } from "../Middlewares/checkAdminAuth.ts";
+import { checkAdminAuth } from "../Middlewares/checkAdminAuth.js";
 import {
   addPetBreed,
   addPetType,
@@ -11,7 +11,7 @@ import {
   loginAdmin,
   toggleServicePackage,
   updateServicePackage,
-} from "../Controllers/AdminAuthController.ts";
+} from "../Controllers/AdminAuthController.js";
 
 const adminRouter = express.Router();
 

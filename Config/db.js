@@ -15,7 +15,7 @@ const connectDB = async () => {
     });
   } catch (error) {
     console.error("❌ MONGO CONNECTION ERROR:", error);
-    process.exit(1); // optional: stop app if DB fails to connect
+    process.exit(1); 
   }
 };
 

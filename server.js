@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "./Config/db.ts";
-import userRouter from "./Routes/UserRoute.ts";
-import adminRouter from "./Routes/AdminRoutes.ts";
+import connectDB from "./Config/db.js";
+import userRouter from "./Routes/UserRoute.js";
+import adminRouter from "./Routes/AdminRoutes.js";
 import Admin from "./Models/AdminModel.js";
 import bcrypt from "bcryptjs";
 import PetBreed from "./Models/PetBreedModel.js";
@@ -18,7 +18,6 @@ app.use(express.json());
 
 app.use("/api", userRouter);
 app.use("/api", adminRouter);
-
 
 connectDB();
 
@@ -103,8 +102,7 @@ connectDB();
 //   }
 // };
 
-
-app.get("/", (req: express.Request, res: express.Response) => {
+app.get("/", (req, res) => {
   res.send("API is running...");
 });
 

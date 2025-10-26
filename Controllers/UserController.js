@@ -1,28 +1,23 @@
 import bcrypt from "bcryptjs";
 import User from "../Models/UserModel.js";
-import { generateToken } from "../Helpers/generateToken.ts";
+import { generateToken } from "../Helpers/generateToken.js";
 import ServiceArea from "../Models/ServiceAreaModel.js";
 import Pet from "../Models/PetModel.js";
 import PetType from "../Models/PetTypeModel.js";
 import PetBreed from "../Models/PetBreedModel.js";
 import ServicePackage from "../Models/ServicePackageModel.js";
 
-export const login = async (req: any, res: any) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const errors = [];
-    if (!email) {
-      errors.push("Email Is Required");
-    }
-    if (!password) {
-      errors.push("Password Is Required");
-    }
+    if (!email) errors.push("Email Is Required");
+    if (!password) errors.push("Password Is Required");
+
     if (errors.length > 0) {
-      return res.send({
-        message: errors,
-        success: false,
-      });
+      return res.send({ message: errors, success: false });
     }
+
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.send({
@@ -30,31 +25,23 @@ export const login = async (req: any, res: any) => {
         success: false,
       });
     }
+
     const isMatch = await bcrypt.compare(password, existingUser.password);
 
     if (!isMatch) {
-      return res.send({
-        message: "Incorrect Password",
-        success: false,
-      });
+      return res.send({ message: "Incorrect Password", success: false });
     }
+
     const token = generateToken(existingUser._id);
 
-    return res.send({
-      message: "Login Successfull",
-      token: token,
-      success: true,
-    });
-  } catch (error: any) {
+    return res.send({ message: "Login Successfull", token, success: true });
+  } catch (error) {
     console.log("ERROR WHILE LOGIN", error);
-    res.send({
-      message: error.message,
-      success: false,
-    });
+    res.send({ message: error.message, success: false });
   }
 };
 
-export const signUp = async (req: any, res: any) => {
+export const signUp = async (req, res) => {
   const {
     name,
     email,
@@ -68,7 +55,7 @@ export const signUp = async (req: any, res: any) => {
   } = req.body;
 
   try {
-    const errors: string[] = [];
+    const errors = [];
 
     if (!name) errors.push("Name is required");
     if (!email) errors.push("Email is required");
@@ -119,15 +106,17 @@ export const signUp = async (req: any, res: any) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).send({
-        message: "User with this email already exists",
-        success: false,
-      });
+      return res
+        .status(400)
+        .send({
+          message: "User with this email already exists",
+          success: false,
+        });
     }
 
     const saltKey = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, saltKey);
-    const newUserData: any = {
+    const newUserData = {
       name,
       email,
       password: hashPassword,
@@ -162,24 +151,20 @@ export const signUp = async (req: any, res: any) => {
 
     const token = generateToken(newUser._id);
 
-    res.send({
-      message: "User registered successfully",
-      success: true,
-      token,
-    });
-  } catch (error: any) {
+    res.send({ message: "User registered successfully", success: true, token });
+  } catch (error) {
     console.error("ERROR DURING SIGNUP", error);
     res.status(500).send({ message: error.message, success: false });
   }
 };
 
-export const getUser = async (req: any, res: any) => {
+export const getUser = async (req, res) => {
   const userId = req.userId;
 
   try {
-    const findUser = (await User.findById(userId)
+    const findUser = await User.findById(userId)
       .select("-password -createdAt -updatedAt")
-      .lean()) as any;
+      .lean();
 
     if (!findUser) {
       return res
@@ -189,9 +174,7 @@ export const getUser = async (req: any, res: any) => {
 
     let serviceArea = null;
     if (findUser.isProvider) {
-      const sa = (await ServiceArea.findOne({
-        userId: findUser._id,
-      }).lean()) as any;
+      const sa = await ServiceArea.findOne({ userId: findUser._id }).lean();
       if (sa) {
         const { _id, ...rest } = sa;
         serviceArea = { ...rest, serviceAreaId: _id };
@@ -202,28 +185,19 @@ export const getUser = async (req: any, res: any) => {
       .select("-createdAt -updatedAt")
       .lean();
 
-    const pets = petsRaw.map(({ _id, ...rest }) => ({
-      ...rest,
-      petId: _id,
-    }));
+    const pets = petsRaw.map(({ _id, ...rest }) => ({ ...rest, petId: _id }));
 
-    const userObj = {
-      ...findUser,
-      userId: findUser._id,
-      serviceArea,
-      pets,
-    };
-
+    const userObj = { ...findUser, userId: findUser._id, serviceArea, pets };
     delete userObj._id;
 
     res.json({ success: true, user: userObj });
-  } catch (error: any) {
+  } catch (error) {
     console.error("ERROR FETCHING USER:", error);
     res.status(500).json({ message: error.message, success: false });
   }
 };
 
-export const updateProfile = async (req: any, res: any) => {
+export const updateProfile = async (req, res) => {
   const userId = req.userId;
   const {
     name,
@@ -235,7 +209,7 @@ export const updateProfile = async (req: any, res: any) => {
   } = req.body;
 
   try {
-    const errors: string[] = [];
+    const errors = [];
 
     if (!name) errors.push("Name is required");
 
@@ -267,9 +241,8 @@ export const updateProfile = async (req: any, res: any) => {
         ) {
           errors.push("At least one service must be offered");
         }
-        if (!providerDetails.experience) {
+        if (!providerDetails.experience)
           errors.push("Experience is required for providers");
-        }
       }
 
       if (providerVerification) {
@@ -279,12 +252,10 @@ export const updateProfile = async (req: any, res: any) => {
         ) {
           errors.push("Aadhaar number must be 12 digits");
         }
-        if (!providerVerification.aadhaarFrontPhoto) {
+        if (!providerVerification.aadhaarFrontPhoto)
           errors.push("Aadhaar front photo is required");
-        }
-        if (!providerVerification.aadhaarBackPhoto) {
+        if (!providerVerification.aadhaarBackPhoto)
           errors.push("Aadhaar back photo is required");
-        }
         if (typeof providerVerification.verified !== "boolean") {
           errors.push("Verified status must be boolean");
         }
@@ -356,32 +327,27 @@ export const updateProfile = async (req: any, res: any) => {
     }
 
     res.send({ message: "Profile updated successfully", success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("ERROR DURING PROFILE UPDATE", error);
     res.status(500).send({ message: error.message, success: false });
   }
 };
 
-export const getPetTypes = async (req: any, res: any) => {
+export const getPetTypes = async (req, res) => {
   try {
     const petTypes = await PetType.find().sort({ createdAt: -1 });
-
     const petData = petTypes.map((pet) => ({
       petType: pet.name,
       petTypeId: pet._id,
     }));
-    res.send({
-      status: true,
-      petTypes: petData,
-      message: "Pet Types",
-    });
-  } catch (error: any) {
+    res.send({ status: true, petTypes: petData, message: "Pet Types" });
+  } catch (error) {
     console.log("GET PET TYPES ERROR", error);
     res.send({ message: error.message, status: false });
   }
 };
 
-export const getBreedsByType = async (req: any, res: any) => {
+export const getBreedsByType = async (req, res) => {
   const { petTypeId } = req.params;
   try {
     const breeds = await PetBreed.find({ petTypeId })
@@ -389,22 +355,18 @@ export const getBreedsByType = async (req: any, res: any) => {
       .lean();
     const petBreeds = breeds.map((pet) => pet.name);
     res.status(200).json({ success: true, breeds: petBreeds });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getServicePackages = async (req: any, res: any) => {
+export const getServicePackages = async (req, res) => {
   try {
     const { typeId } = req.params;
-    const serviceMap: Record<string, string> = {
-      "1": "Walking",
-      "2": "Grooming",
-    };
+    const serviceMap = { 1: "Walking", 2: "Grooming" };
     const serviceName = serviceMap[typeId];
 
     const filter = serviceName ? { serviceType: serviceName } : {};
-
     const packages = await ServicePackage.find(filter)
       .select("-__v")
       .lean()
@@ -412,15 +374,12 @@ export const getServicePackages = async (req: any, res: any) => {
 
     const structuredPackages = packages.map((pack) => {
       const { _id, addons = [], trimming = [], ...rest } = pack;
-
       const cleanedAddons = addons.map(({ _id, ...addonRest }) => ({
         ...addonRest,
       }));
-
       const cleanedTrimming = trimming.map(({ _id, ...trimRest }) => ({
         ...trimRest,
       }));
-
       return {
         ...rest,
         packageId: _id,
@@ -430,7 +389,7 @@ export const getServicePackages = async (req: any, res: any) => {
     });
 
     res.status(200).json({ success: true, packages: structuredPackages });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

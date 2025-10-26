@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "your_admin_secret_key";
 
-export const checkAdminAuth = (req: any, res: any, next: any) => {
+export const checkAdminAuth = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -13,7 +13,7 @@ export const checkAdminAuth = (req: any, res: any, next: any) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     req.adminId = decoded.adminId;
     next();

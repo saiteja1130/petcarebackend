@@ -1,12 +1,12 @@
 import Pet from "../Models/PetModel.js";
 
-export const createPet = async (req: any, res: any) => {
+export const createPet = async (req, res) => {
   const ownerId = req.userId;
   const { name, type, breed, age, gender, vaccination, petPhoto, notes } =
     req.body;
 
   try {
-    const errors: string[] = [];
+    const errors = [];
 
     if (!name) errors.push("Pet name is required");
     if (!type) errors.push("Pet type is required");
@@ -54,16 +54,16 @@ export const createPet = async (req: any, res: any) => {
       success: true,
       pet: {
         ...newPet.toObject(),
-        petId: newPet._id, // send petId instead of _id
+        petId: newPet._id,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("ERROR ADDING PET:", error);
     res.status(500).send({ message: error.message, success: false });
   }
 };
 
-export const updatePet = async (req: any, res: any) => {
+export const updatePet = async (req, res) => {
   const ownerId = req.userId;
   const {
     petId,
@@ -78,7 +78,7 @@ export const updatePet = async (req: any, res: any) => {
   } = req.body;
 
   try {
-    const errors: string[] = [];
+    const errors = [];
 
     if (!petId) errors.push("Pet ID is required");
     if (!name) errors.push("Pet name is required");
@@ -127,15 +127,15 @@ export const updatePet = async (req: any, res: any) => {
       message: "Pet updated successfully",
       success: true,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("ERROR UPDATING PET:", error);
     res.status(500).send({ message: error.message, success: false });
   }
 };
 
-export const deletePet = async (req: any, res: any) => {
-  const userId = req.userId; 
-  const { petId } = req.body; 
+export const deletePet = async (req, res) => {
+  const userId = req.userId;
+  const { petId } = req.body;
 
   if (!petId) {
     return res
@@ -158,7 +158,7 @@ export const deletePet = async (req: any, res: any) => {
     await Pet.findByIdAndDelete(petId);
 
     res.send({ message: "Pet deleted successfully", success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("ERROR DELETING PET:", error);
     res.status(500).send({ message: error.message, success: false });
   }

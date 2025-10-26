@@ -7,7 +7,7 @@ import ServicePackage from "../Models/ServicePackageModel.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_admin_secret_key";
 
-export const loginAdmin = async (req: any, res: any) => {
+export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -48,13 +48,13 @@ export const loginAdmin = async (req: any, res: any) => {
         email: admin.email,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("ADMIN LOGIN ERROR:", error);
     res.status(500).send({ message: error.message, success: false });
   }
 };
 
-export const addPetType = async (req: any, res: any) => {
+export const addPetType = async (req, res) => {
   const { name } = req.body;
   try {
     if (!name) {
@@ -72,19 +72,19 @@ export const addPetType = async (req: any, res: any) => {
       });
     }
 
-    const pet = await PetType.create({ name });
+    await PetType.create({ name });
 
     res.send({
       message: "Pet Type Added Successfully",
       status: true,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log("PET ADD ERROR", error);
     res.send({ message: error.message, status: false });
   }
 };
 
-export const getPetTypes = async (req: any, res: any) => {
+export const getPetTypes = async (req, res) => {
   try {
     const petTypes = await PetType.find().sort({ createdAt: -1 });
     const petData = petTypes.map((pet) => ({
@@ -96,16 +96,16 @@ export const getPetTypes = async (req: any, res: any) => {
       petTypes: petData,
       message: "Pet Types",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log("GET PET TYPES ERROR", error);
     res.send({ message: error.message, status: false });
   }
 };
 
-export const deletePetType = async (req: any, res: any) => {
+export const deletePetType = async (req, res) => {
   const { petTypeId } = req.body;
   try {
-    const petDeleted = await PetType.findByIdAndDelete({ _id: petTypeId });
+    const petDeleted = await PetType.findByIdAndDelete(petTypeId);
     if (!petDeleted) {
       return res.send({
         message: "Pet type not found",
@@ -116,13 +116,13 @@ export const deletePetType = async (req: any, res: any) => {
       status: true,
       message: "Pet type deleted successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.log("DELETE PET TYPES ERROR", error);
     res.send({ message: error.message, status: false });
   }
 };
 
-export const addPetBreed = async (req: any, res: any) => {
+export const addPetBreed = async (req, res) => {
   const { petTypeId, name } = req.body;
 
   try {
@@ -142,12 +142,12 @@ export const addPetBreed = async (req: any, res: any) => {
     await breed.save();
 
     res.status(201).json({ success: true, breed });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getBreedsByType = async (req: any, res: any) => {
+export const getBreedsByType = async (req, res) => {
   const { petTypeId } = req.params;
   try {
     const breeds = await PetBreed.find({ petTypeId })
@@ -155,12 +155,12 @@ export const getBreedsByType = async (req: any, res: any) => {
       .lean();
     const petBreeds = breeds.map((pet) => pet.name);
     res.status(200).json({ success: true, breeds: petBreeds });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const addServicePackage = async (req: any, res: any) => {
+export const addServicePackage = async (req, res) => {
   try {
     const { serviceType, packageType, duration, price, addons, trimming } =
       req.body;
@@ -179,7 +179,7 @@ export const addServicePackage = async (req: any, res: any) => {
         .json({ success: false, message: "Package already exists" });
     }
 
-    const newPackage = await ServicePackage.create({
+    await ServicePackage.create({
       serviceType,
       packageType,
       duration,
@@ -189,13 +189,13 @@ export const addServicePackage = async (req: any, res: any) => {
       isActive: true,
     });
 
-    res.status(201).json({ success: true ,message:"Service Package Added Successfully" });
-  } catch (error: any) {
+    res.status(201).json({ success: true, message: "Service Package Added Successfully" });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const updateServicePackage = async (req: any, res: any) => {
+export const updateServicePackage = async (req, res) => {
   try {
     const { packageId, ...updateData } = req.body;
 
@@ -223,12 +223,12 @@ export const updateServicePackage = async (req: any, res: any) => {
       success: true,
       message: "Package updated successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const toggleServicePackage = async (req: any, res: any) => {
+export const toggleServicePackage = async (req, res) => {
   try {
     const { packageId } = req.params;
     const { isActive } = req.body;
@@ -247,15 +247,15 @@ export const toggleServicePackage = async (req: any, res: any) => {
     res
       .status(200)
       .json({ success: true, message: "Package Status updated Successfully" });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getServicePackages = async (req: any, res: any) => {
+export const getServicePackages = async (req, res) => {
   try {
     const { typeId } = req.params;
-    const serviceMap: Record<string, string> = {
+    const serviceMap = {
       "1": "Walking",
       "2": "Grooming",
     };
@@ -281,14 +281,14 @@ export const getServicePackages = async (req: any, res: any) => {
 
       return {
         ...rest,
-        packageId: _id, 
+        packageId: _id,
         addons: cleanedAddons,
         trimming: cleanedTrimming,
       };
     });
 
     res.status(200).json({ success: true, packages: structuredPackages });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -7,13 +7,13 @@ import {
   login,
   signUp,
   updateProfile,
-} from "../Controllers/UserController.ts";
+} from "../Controllers/UserController.js";
 import checkAuth from "../Middlewares/checkAuth.js";
 import {
   createPet,
   deletePet,
   updatePet,
-} from "../Controllers/PetController.ts";
+} from "../Controllers/PetController.js";
 
 const userRouter = express.Router();
 
