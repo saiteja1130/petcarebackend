@@ -33,6 +33,7 @@ const UserSchema = new mongoose.Schema(
       aadhaarBackPhoto: { type: String },
       verified: { type: Boolean, default: false },
     },
+    deviceToken: { type: String, required: true },
   },
   { timestamps: true }
 );

@@ -8,11 +8,12 @@ import PetBreed from "../Models/PetBreedModel.js";
 import ServicePackage from "../Models/ServicePackageModel.js";
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, deviceToken } = req.body;
   try {
     const errors = [];
     if (!email) errors.push("Email Is Required");
     if (!password) errors.push("Password Is Required");
+    if (!deviceToken) errors.push("Device Token Is Required");
 
     if (errors.length > 0) {
       return res.send({ message: errors, success: false });
@@ -32,9 +33,14 @@ export const login = async (req, res) => {
       return res.send({ message: "Incorrect Password", success: false });
     }
 
+    if (deviceToken) {
+      existingUser.deviceToken = deviceToken;
+      await existingUser.save();
+    }
+
     const token = generateToken(existingUser._id);
 
-    return res.send({ message: "Login Successfull", token, success: true });
+    return res.send({ message: "Login Successful", token, success: true });
   } catch (error) {
     console.log("ERROR WHILE LOGIN", error);
     res.send({ message: error.message, success: false });
@@ -52,6 +58,7 @@ export const signUp = async (req, res) => {
     isProvider,
     providerDetails,
     serviceArea,
+    deviceToken, // <-- required now
   } = req.body;
 
   try {
@@ -71,6 +78,10 @@ export const signUp = async (req, res) => {
       if (!address.pincode) errors.push("Pincode is required");
       if (!address.longitude) errors.push("Longitude is required");
       if (!address.latitude) errors.push("Latitude is required");
+    }
+
+    if (!deviceToken) {
+      errors.push("Device token is required"); // <-- throw error if missing
     }
 
     if (isProvider) {
@@ -106,16 +117,15 @@ export const signUp = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res
-        .status(400)
-        .send({
-          message: "User with this email already exists",
-          success: false,
-        });
+      return res.status(400).send({
+        message: "User with this email already exists",
+        success: false,
+      });
     }
 
     const saltKey = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, saltKey);
+
     const newUserData = {
       name,
       email,
@@ -124,6 +134,7 @@ export const signUp = async (req, res) => {
       address,
       profile: profile || "",
       isProvider: !!isProvider,
+      deviceToken, // <-- required, already checked
     };
 
     if (isProvider && providerDetails) {
