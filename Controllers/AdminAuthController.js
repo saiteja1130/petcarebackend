@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Admin from "../Models/AdminModel.js";
-import PetType from "../Models/PetTypeModel.js";
-import PetBreed from "../Models/PetBreedModel.js";
-import ServicePackage from "../Models/ServicePackageModel.js";
+import Admin from "../Models/AdminModels/AdminModel.js";
+import PetType from "../Models/PetModels/PetTypeModel.js";
+import PetBreed from "../Models/PetModels/PetBreedModel.js";
+import ServicePackage from "../Models/PackagesModels/ServicePackageModel.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_admin_secret_key";
 
@@ -288,6 +288,24 @@ export const getServicePackages = async (req, res) => {
     });
 
     res.status(200).json({ success: true, packages: structuredPackages });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const deleteServicePackage = async (req, res) => {
+  try {
+    const { packageId } = req.params;
+    const deletedPackage = await ServicePackage.findByIdAndDelete(packageId);
+    if (!deletedPackage) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Package not found" });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Package deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

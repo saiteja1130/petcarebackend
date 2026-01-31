@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+// MONGO_DB=mongodb+srv://saiintern:Saiteja1920@cluster.0hq2xic.mongodb.net/
 
 const UserSchema = new mongoose.Schema(
   {

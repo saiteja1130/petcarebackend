@@ -1,4 +1,4 @@
-import Pet from "../Models/PetModel.js";
+import Pet from "../Models/PetModels/PetModel.js";
 
 export const createPet = async (req, res) => {
   const ownerId = req.userId;

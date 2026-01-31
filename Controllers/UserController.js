@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
-import User from "../Models/UserModel.js";
+import User from "../Models/UserModels/UserModel.js";
 import { generateToken } from "../Helpers/generateToken.js";
-import ServiceArea from "../Models/ServiceAreaModel.js";
-import Pet from "../Models/PetModel.js";
-import PetType from "../Models/PetTypeModel.js";
-import PetBreed from "../Models/PetBreedModel.js";
-import ServicePackage from "../Models/ServicePackageModel.js";
+import ServiceArea from "../Models/ServiceAreaModels/ServiceAreaModel.js";
+import Pet from "../Models/PetModels/PetModel.js";
+import PetType from "../Models/PetModels/PetTypeModel.js";
+import PetBreed from "../Models/PetModels/PetBreedModel.js";
+import ServicePackage from "../Models/PackagesModels/ServicePackageModel.js";
 
 export const login = async (req, res) => {
   const { email, password, deviceToken } = req.body;

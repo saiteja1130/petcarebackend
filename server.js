@@ -3,10 +3,6 @@ import dotenv from "dotenv";
 import connectDB from "./Config/db.js";
 import userRouter from "./Routes/UserRoute.js";
 import adminRouter from "./Routes/AdminRoutes.js";
-import Admin from "./Models/AdminModel.js";
-import bcrypt from "bcryptjs";
-import PetBreed from "./Models/PetBreedModel.js";
-import PetType from "./Models/PetTypeModel.js";
 
 // Load environment variables
 dotenv.config();

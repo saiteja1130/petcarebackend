@@ -5,6 +5,7 @@ import {
   addPetType,
   addServicePackage,
   deletePetType,
+  deleteServicePackage,
   getBreedsByType,
   getPetTypes,
   getServicePackages,
@@ -41,6 +42,11 @@ adminRouter.get(
   "/admin/getServicePackages/:typeId",
   checkAdminAuth,
   getServicePackages
+);
+adminRouter.post(
+  "/admin/deleteServicePackage/:packageId",
+  checkAdminAuth,
+  deleteServicePackage
 );
 
 
